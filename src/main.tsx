@@ -3,11 +3,12 @@ import ReactDOM from "react-dom/client";
 import App from "./components/App.tsx";
 
 import "./index.css";
-// import Bank from "./components/Bank";
+import { QuestionProvider } from "./context/questionContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
-    {/* <Bank /> */}
+    <QuestionProvider>
+      <App />
+    </QuestionProvider>
   </React.StrictMode>
 );

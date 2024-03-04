@@ -1,13 +1,11 @@
 import { useEffect } from "react";
-import { REDUCER_TYPE, ReducerActionType } from "../../types/model";
+import { REDUCER_TYPE } from "../../types/model";
+import { useQuestion } from "../../context/questionContext";
 
-type Prop = {
-  time: number;
-  dispatch: React.Dispatch<ReducerActionType>;
-};
-const TimerButton = ({ time, dispatch }: Prop) => {
-  const min = Math.floor(time / 60);
-  const sec = time % 60;
+const TimerButton = () => {
+  const { secondsRemaing: time, dispatch } = useQuestion();
+  const min = time && Math.floor(time / 60);
+  const sec = time && time % 60;
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -18,8 +16,8 @@ const TimerButton = ({ time, dispatch }: Prop) => {
   }, [dispatch]);
   return (
     <div className="timer">
-      {min < 10 && "0"}
-      {min}:{sec < 10 && "0"}
+      {min && min < 10 && "0"}
+      {min}:{sec && sec < 10 && "0"}
       {sec}
     </div>
   );

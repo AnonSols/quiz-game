@@ -1,11 +1,11 @@
+import { useQuestion } from "../../context/questionContext";
 import Info from "./Info";
 
 type prop = {
   children: React.ReactNode;
-  username: string | undefined;
-  points: number;
 };
-const Footer = ({ children, username, points }: prop) => {
+const Footer = ({ children }: prop) => {
+  const { points, name: username } = useQuestion();
   return (
     <footer className="footer">
       <div style={{ width: "100%", marginBottom: "4px" }}>{children}</div>

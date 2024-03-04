@@ -1,12 +1,15 @@
-type Prop = {
-  index: number;
-  length: number;
-  points: number;
-  answer: number | null;
-  maxPoints: number;
-};
+import { useQuestion } from "../../context/questionContext";
 
-const Progress = ({ index, length, points, answer, maxPoints }: Prop) => {
+const Progress = () => {
+  const {
+    index,
+    questionLength: length,
+    points,
+    answer,
+    maxPossiblePoints,
+  } = useQuestion();
+
+  console.log();
   return (
     <header className="progress">
       <progress max={length} value={index + Number(answer !== null)} />
@@ -15,7 +18,7 @@ const Progress = ({ index, length, points, answer, maxPoints }: Prop) => {
         Question <b> {index + 1} </b> / {length}
       </p>
       <p>
-        <b>{points}</b> / {maxPoints} points
+        <b>{points}</b> / {maxPossiblePoints} points
       </p>
     </header>
   );

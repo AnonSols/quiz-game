@@ -11,11 +11,15 @@ const initialState: StateProp = {
   secondsRemaing: 0,
   name: "",
 };
-type createContextProp = typeof initialState & {
+
+type ContextProp = typeof initialState & {
   dispatch: React.Dispatch<ReducerActionType>;
+  questionLength: number;
+  percentage: number;
+  maxPossiblePoints: number;
 };
 
-const questionContext = createContext<createContextProp | undefined>(undefined);
+const QuestionContext = createContext<ContextProp | undefined>(undefined);
 
 type ProviderProp = {
   children: ReactNode;
@@ -118,8 +122,16 @@ function QuestionProvider({ children }: ProviderProp) {
     dispatch,
   ] = useReducer(reducer, initialState);
 
+  const questionLength = question.length;
+  console.log(questionLength)
+  const maxPossiblePoints = question.reduce(
+    (prev, curr) => prev + curr.points,
+    0
+  );
+  const percentage = (points / maxPossiblePoints) * 100;
+
   return (
-    <questionContext.Provider
+    <QuestionContext.Provider
       value={{
         status,
         index,
@@ -129,20 +141,23 @@ function QuestionProvider({ children }: ProviderProp) {
         highscore,
         secondsRemaing,
         name,
+        questionLength,
+        percentage,
+        maxPossiblePoints,
         dispatch,
       }}
     >
       {children}
-    </questionContext.Provider>
+    </QuestionContext.Provider>
   );
 }
 
-const useQuestion = () => {
-  const context = useContext(questionContext);
+function useQuestion() {
+  const context = useContext(QuestionContext);
 
   if (context === undefined)
     throw new Error("Context was used outside a provider");
-
+  console.log(context);
   return context;
-};
+}
 export { useQuestion, QuestionProvider };

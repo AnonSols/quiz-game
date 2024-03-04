@@ -1,14 +1,9 @@
-import { QuestType, ReducerActionType } from "../../types/model";
+import { useQuestion } from "../../context/questionContext";
 import Options from "./Options";
 
-type Prop = {
-  question: QuestType;
-  dispatch: React.Dispatch<ReducerActionType>;
-  answer: null | number;
-  points: number;
-};
-
-const Question = ({ question, dispatch, answer }: Prop) => {
+const Question = () => {
+  const { dispatch, answer, index, question: que } = useQuestion();
+  const question = que[index];
   return (
     <div>
       <h4>{question.question}</h4>

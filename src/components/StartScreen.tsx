@@ -1,19 +1,17 @@
-import { REDUCER_TYPE, ReducerActionType } from "../types/model";
+import { useQuestion } from "../context/questionContext";
+import { REDUCER_TYPE } from "../types/model";
 
 type Props = {
-  length: number;
-  dispatch: React.Dispatch<ReducerActionType>;
   children: React.ReactNode;
-  name: string | undefined;
-  score: number;
 };
 
-const StartScreen = ({ length, dispatch, children, name, score }: Props) => {
+const StartScreen = ({ children }: Props) => {
+  const { dispatch, name, questionLength, highscore } = useQuestion();
   const nameLength = name?.length;
   return (
     <div className="start">
       <h2>Welcome to the react quiz</h2>
-      <h3>{length} questions to test your React skills</h3>
+      <h3>{questionLength} questions to test your React skills</h3>
       {/* look for how to check for empty space in input and fix input space bug. */}
       {children}
       {nameLength
@@ -29,11 +27,11 @@ const StartScreen = ({ length, dispatch, children, name, score }: Props) => {
           )
         : ""}
       <br />
-      {score > 0 && (
+      {highscore > 0 && (
         <div className="highscore">
           <br />
           <p>
-            Current high score is <strong>{score}</strong>
+            Current high score is <strong>{highscore}</strong>
           </p>
         </div>
       )}

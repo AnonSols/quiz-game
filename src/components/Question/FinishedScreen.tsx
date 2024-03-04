@@ -1,20 +1,14 @@
 import React from "react";
-import { REDUCER_TYPE, ReducerActionType } from "../../types/model";
+import { REDUCER_TYPE } from "../../types/model";
+import { useQuestion } from "../../context/questionContext";
 
 type prop = {
   children: React.ReactNode;
-  percentage: number;
-  dispatch: React.Dispatch<ReducerActionType>;
-  highscore: number;
 };
-const FinishedScreen = ({
-  children,
-  percentage,
-  dispatch,
-  highscore,
-}: prop) => {
+const FinishedScreen = ({ children }: prop) => {
   let emoji!: string;
 
+  const { percentage, dispatch, highscore } = useQuestion();
   if (percentage === 100) emoji = "💰";
   if (percentage >= 80 && percentage < 100) emoji = "🍾";
   if (percentage >= 50 && percentage <= 80) emoji = "🤓";

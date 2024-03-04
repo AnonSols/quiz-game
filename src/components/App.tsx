@@ -1,133 +1,32 @@
-import { useEffect, useReducer } from "react";
+import { useEffect } from "react";
 import Header from "./Header";
 import Main from "./Main";
 import Loader from "./Loader";
 import ErrorLoader from "./ErrorLoader";
 import StartScreen from "./StartScreen";
 import Question from "./Question/Question";
-import { REDUCER_TYPE, ReducerActionType, StateProp } from "../types/model";
+import { REDUCER_TYPE } from "../types/model";
 import NexButton from "./User'sInfo/NexButton";
 import Progress from "./Question/Progress";
 import TimerButton from "./User'sInfo/TimerButton";
 
 import FinishedScreen from "./Question/FinishedScreen";
 import Footer from "./User'sInfo/Footer";
+import { useQuestion } from "../context/questionContext";
 
 export default function App() {
-  // const [dispatch,( state, question, index)] = useReducerState();
-  const InitialState: StateProp = {
-    question: [],
-    index: 0,
-    status: "loading",
-    answer: null,
-    points: 0,
-    highscore: Number(localStorage.getItem("score")) || 0,
-    secondsRemaing: 0,
-    name: "",
-  };
-
-  function reducer(
-    state: typeof InitialState,
-    action: ReducerActionType
-  ): typeof InitialState {
-    switch (action.type) {
-      case REDUCER_TYPE.DATA_RECIEVED:
-        return {
-          ...state,
-          question: action.payload?.question ?? [],
-          status: "ready",
-        };
-
-      case REDUCER_TYPE.DATA_ERROR:
-        return { ...state, status: "error" };
-
-      case REDUCER_TYPE.USERSNAME:
-        return {
-          ...state,
-          name: action.payload?.event?.target.value,
-        };
-
-      case REDUCER_TYPE.DATA_ACTIVE:
-        return {
-          ...state,
-          status: "active",
-          secondsRemaing:
-            state.question.length * REDUCER_TYPE.SECS_PER_QUESTION,
-        };
-
-      case REDUCER_TYPE.DATA_FINISHED:
-        return {
-          ...state,
-          status: "finished",
-          index: 0,
-          answer: null,
-          highscore:
-            state.points > state.highscore ? state.points : state.highscore,
-        };
-
-      case REDUCER_TYPE.ANSWER:
-        // Unexpected lexical declaration in case block.eslintno-case-declarations
-        return {
-          ...state,
-          answer: action.payload?.answer ?? null,
-          points: action.payload?.points
-            ? state.points + (action.payload?.points ?? state.points)
-            : state.points,
-        };
-
-      case REDUCER_TYPE.NEXT:
-        return {
-          ...state,
-          index: state.index++,
-          answer: null,
-        };
-
-      case REDUCER_TYPE.RESTART:
-        return {
-          ...state,
-          status: "ready",
-          points: 0,
-          index: 0,
-          name: "",
-          answer: null,
-        };
-
-      case REDUCER_TYPE.TIMER:
-        return {
-          ...state,
-          status: state.secondsRemaing === 1 ? "finished" : state.status,
-          secondsRemaing: state.secondsRemaing - 1,
-          highscore:
-            state.points > state.highscore ? state.points : state.highscore,
-        };
-
-      default:
-        throw new Error(
-          "This code is never to be reached, unreachable code reached."
-        );
-    }
-  }
-
-  const [
-    {
-      status,
-      index,
-      question,
-      answer,
-      points,
-      highscore,
-      secondsRemaing,
-      name,
-    },
+  const {
+    highscore,
+    points,
+    name,
     dispatch,
-  ] = useReducer(reducer, InitialState);
-
-  const questionLength = question.length;
-  const maxPossiblePoints = question.reduce(
-    (prev, curr) => prev + curr.points,
-    0
-  );
-  const percentage = (points / maxPossiblePoints) * 100;
+    index,
+    status,
+    answer,
+    questionLength,
+    percentage,
+    maxPossiblePoints,
+  } = useQuestion();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -160,11 +59,12 @@ export default function App() {
     fetchData();
 
     return () => controller.abort();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     localStorage.setItem("score", JSON.stringify(highscore));
   }, [highscore]);
+
   return (
     <div className="app">
       <Header />
@@ -172,12 +72,7 @@ export default function App() {
         {status === "loading" && <Loader />}
         {status === "error" && <ErrorLoader />}
         {status === "ready" && (
-          <StartScreen
-            length={questionLength}
-            dispatch={dispatch}
-            name={name}
-            score={highscore}
-          >
+          <StartScreen>
             <div>
               <input
                 type="text"
@@ -203,23 +98,12 @@ export default function App() {
         )}
         {status === "active" && (
           <>
-            <Progress
-              points={points}
-              length={questionLength}
-              index={index}
-              answer={answer}
-              maxPoints={maxPossiblePoints}
-            />
+            <Progress />
 
-            <Question
-              question={question[index]}
-              dispatch={dispatch}
-              answer={answer}
-              points={points}
-            />
+            <Question />
 
-            <Footer username={name} points={points}>
-              <TimerButton time={secondsRemaing} dispatch={dispatch} />
+            <Footer>
+              <TimerButton />
 
               <NexButton>
                 <div>
@@ -247,11 +131,7 @@ export default function App() {
         )}
 
         {status === "finished" && (
-          <FinishedScreen
-            percentage={percentage}
-            dispatch={dispatch}
-            highscore={highscore}
-          >
+          <FinishedScreen>
             <>
               {name} You scored <b>{points}</b> out of {maxPossiblePoints} (
               {Math.ceil(percentage)}%)
